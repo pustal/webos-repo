@@ -1,0 +1,16 @@
+{
+  "name": "webos-repo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "pustal's repository for the webOS Homebrew Channel",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:offline": "node scripts/build.mjs --offline",
+    "serve": "npm run build && npx --yes http-server@14.1.1 public -p 8000 -c-1 --cors"
+  },
+  "devDependencies": {
+    "marked": "^14.1.4",
+    "yaml": "^2.6.1"
+  }
+}

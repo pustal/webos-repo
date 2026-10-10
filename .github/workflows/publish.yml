@@ -1,0 +1,56 @@
+# Builds the repository (scripts/build.mjs) and publishes it to GitHub Pages
+# at https://pustal.github.io/webos-repo/.
+#
+# One-time setup: in the GitHub repository, Settings → Pages → Build and
+# deployment → Source: "GitHub Actions".
+#
+# Runs on every push to main that changes an app entry or the build, and
+# can be started by hand (Actions → Publish → Run workflow). Pull requests
+# only build, which checks the entries and their manifests.
+name: Publish
+
+on:
+  push:
+    branches: [main]
+    paths: ['packages/**', 'scripts/**', 'package.json', 'package-lock.json', '.github/workflows/publish.yml']
+  pull_request:
+    paths: ['packages/**', 'scripts/**', 'package.json', 'package-lock.json', '.github/workflows/publish.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; a newer push replaces a queued one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Fails when an entry is invalid or its manifest can't be downloaded.
+      - run: npm run build
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
