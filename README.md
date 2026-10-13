@@ -15,6 +15,7 @@ The apps then appear in the Homebrew Channel's list next to the official ones, a
 | App | Description |
 | --- | --- |
 | [Stash](https://github.com/pustal/StashWebOS) | Client for Stash, the self-hosted media organizer |
+| [Malagueta](https://github.com/pustal/Malagueta) | Adult website viewer with ad and pop-up blocking, made for the remote |
 
 ## How it works
 

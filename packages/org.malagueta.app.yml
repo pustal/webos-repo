@@ -1,0 +1,34 @@
+# Malagueta: https://github.com/pustal/Malagueta
+# The file name (without .yml) is the app id, as in appinfo.json.
+
+# Display name of the application
+title: Malagueta
+# Publicly accessible HTTPS link to the icon image itself (not a github.com/.../blob/ page)
+iconUri: https://raw.githubusercontent.com/pustal/Malagueta/main/assets/icons/largeIcon.png
+# The manifest of the latest release (written by `npm run package` in Malagueta)
+manifestUrl: https://github.com/pustal/Malagueta/releases/latest/download/org.malagueta.app.manifest.json
+category: multimedia
+# Open source (GPL-3.0)
+pool: main
+# The package installs on webOS 4, but today's sites need the compatibility
+# layer aimed at webOS 5 and 6 (Chromium 68/79); on webOS 4 most of them fail.
+requirements:
+  webosRelease: '>=5.0'
+description: |
+  An adult website viewer for webOS TVs, made for the remote. **For adults only.**
+
+  - Opens Pornhub, Pornhub Premium, xHamster, FapHouse, RedTube, XVideos,
+    XVideos RED, XNXX, YouPorn, SpankBang and Eporner full screen, plus any site
+    you add yourself
+  - Ad and pop-up blocking, with a picker to hide anything the lists miss
+  - Sign in to your accounts, browse and search, as in a browser
+  - Arrow-key navigation for mouse-first sites, colour-button menu, search,
+    zoom and full-screen video with the remote's media keys
+  - Makes today's sites run on the TV's older browser engine
+  - Optional PIN lock for a shared TV
+
+  Malagueta is an independent viewer, not affiliated with or endorsed by any of
+  these sites. Respect each site's terms and your local laws.
+# Sponsor information, like .github/FUNDING.yml
+funding:
+  ko_fi: pustal
