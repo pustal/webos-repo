@@ -26,7 +26,11 @@
  *
  * Each manifest is downloaded during the build to check it (id, version,
  * .ipk link and hash) and to take the app's one-line description from it;
- * a broken one fails the build. `--offline` skips that (for a quick local
+ * a broken one fails the build. An app whose manifest isn't there yet (HTTP
+ * 404: no GitHub release with the manifest attached) is left out of the
+ * listing with a warning instead, so adding an app before its first release
+ * doesn't stop the other apps from being published; it appears with the
+ * next build after the release. `--offline` skips all of that (for a quick local
  * preview); the one-line description then comes from `shortDescription` in
  * the YAML, if set.
  *
@@ -113,14 +117,23 @@ function readPackage(file) {
   return Object.assign({ id }, info);
 }
 
+/** Marks an app whose manifest doesn't exist yet (see fetchManifest). */
+const UNRELEASED = Symbol('unreleased');
+
 /**
  * Downloads and checks an app's manifest.
- * @returns {Promise<Object|null>}
+ * @returns {Promise<Object|null|symbol>} the manifest; null when it is broken
+ *   (an error is recorded); UNRELEASED when there is no release with it yet
  */
 async function fetchManifest(pkg) {
   let manifest;
   try {
     const res = await fetch(pkg.manifestUrl, { redirect: 'follow' });
+    if (res.status === 404) {
+      console.warn(`Warning: ${pkg.id}: left out, its manifest isn't released yet (HTTP 404 for ${pkg.manifestUrl}). `
+        + 'Attach it to a GitHub release of the app and build again.');
+      return UNRELEASED;
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     manifest = await res.json();
   } catch (err) {
@@ -207,10 +220,12 @@ function write(path, text) {
 
 async function main() {
   const files = readdirSync(packagesDir).filter((f) => /\.ya?ml$/.test(f)).sort();
-  const packages = files.map(readPackage).filter(Boolean);
+  let packages = files.map(readPackage).filter(Boolean);
   if (!offline) {
     const manifests = await Promise.all(packages.map((p) => (p.manifestUrl ? fetchManifest(p) : null)));
     packages.forEach((p, i) => { p.manifest = manifests[i]; });
+    // Apps without a release yet aren't listed: the TV couldn't install them.
+    packages = packages.filter((p) => p.manifest !== UNRELEASED);
   }
   if (errors.length) {
     console.error(`The repository was not built:\n  ${errors.join('\n  ')}`);

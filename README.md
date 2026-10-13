@@ -86,6 +86,8 @@ Each entry points at its app's **latest** release manifest (`.../releases/latest
 
 3. Run `npm run build` to check it (it downloads the manifest and fails on mistakes such as a missing field, a `.../blob/...` icon link or a manifest for another app id), then push to `main`. Also add the app to the table above.
 
+   An app whose manifest isn't released yet (HTTP 404) is left out with a warning rather than failing the build, so the other apps still get published. It shows up after its first release: re-run the Publish workflow (**Actions → Publish → Run workflow**) or push again.
+
 ## Build locally
 
 Requires Node.js 22 (see `.nvmrc`).
