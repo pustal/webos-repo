@@ -16,6 +16,7 @@ The apps then appear in the Homebrew Channel's list next to the official ones, a
 | --- | --- |
 | [Stash](https://github.com/pustal/StashWebOS) | Client for Stash, the self-hosted media organizer |
 | [Malagueta](https://github.com/pustal/Malagueta) | Adult website viewer with ad and pop-up blocking, made for the remote |
+| [Prosper LG TV](https://github.com/pustal/ProsperLGTV) | IPTV player for your own M3U playlists, made for the remote |
 
 ## How it works
 
