@@ -25,7 +25,10 @@ description: |
 
   - Plays with game controllers, or with the remote held sideways: 2/8/6/4 as
     the D-pad, the colour buttons as A/B/X/Y (Xbox colours), 0 as Start
-  - Back opens a menu at any time: Resume, Restart game, Close app
+  - Back opens a menu at any time: Resume, Achievements, Button test,
+    Restart game, Close app
+  - All 18 achievements unlock as you play; the menu lists unlocked and
+    locked ones with how to get each
   - Download and upload your saves from the same web page
   - Light on storage: about 4.5 MB installed plus your Data.rsdk; free space
     is checked before anything is written
@@ -39,5 +42,7 @@ screenshots:
     caption: First launch
   - url: https://raw.githubusercontent.com/pustal/SonicWebMania/main/docs/images/menu.png
     caption: Back menu
+  - url: https://raw.githubusercontent.com/pustal/SonicWebMania/main/docs/images/achievements.png
+    caption: Achievements
   - url: https://raw.githubusercontent.com/pustal/SonicWebMania/main/docs/images/web-page.png
     caption: Transfer page
