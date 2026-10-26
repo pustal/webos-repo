@@ -14,6 +14,14 @@
  *   public/api/apps/<id>/releases/latest.json         one app (dev-manager-desktop)
  *   public/index.html                                 a page with the repo address
  *
+ * and a second, complete listing without the apps marked `nsfw: true`, so
+ * the repository can be added on a family TV without the adult apps:
+ *
+ *   public/sfw/api/apps.json, public/sfw/api/apps/..., public/sfw/index.html
+ *
+ * `nsfw` is this repository's own field; it is never copied into the
+ * listings (remove it before submitting an entry to the official repository).
+ *
  * How the Homebrew Channel uses it: it downloads apps.json, lists the
  * `packages`, and when one is opened it downloads its `manifestUrl` (the
  * version, .ipk link and SHA-256 written by each app's release) and its
@@ -47,19 +55,20 @@ import { marked } from 'marked';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const packagesDir = join(root, 'packages');
 const outDir = join(root, 'public');
-const apiDir = join(outDir, 'api');
 
 /** Where the repository is published (GitHub Pages of pustal/webos-repo). */
 const SITE_URL = 'https://pustal.github.io/webos-repo/';
-/** The address to add in the Homebrew Channel's settings. */
+/** The address to add in the Homebrew Channel's settings: every app. */
 const REPO_URL = `${SITE_URL}api/apps.json`;
+/** The same without the apps marked `nsfw: true`. */
+const SFW_REPO_URL = `${SITE_URL}sfw/api/apps.json`;
 
 const offline = process.argv.includes('--offline');
 
 /** Fields copied from the YAML into apps.json, as the official repository does. */
 const LIST_KEYS = ['title', 'iconUri', 'manifestUrl', 'category', 'pool', 'requirements', 'screenshots'];
 /** Every field an entry may have; anything else is probably a typo. */
-const KNOWN_KEYS = LIST_KEYS.concat(['description', 'shortDescription', 'funding', 'detailIconUri']);
+const KNOWN_KEYS = LIST_KEYS.concat(['description', 'shortDescription', 'funding', 'detailIconUri', 'nsfw']);
 const REQUIRED_KEYS = ['title', 'iconUri', 'manifestUrl', 'description'];
 /**
  * Categories the official repository's site groups apps by. Others are
@@ -114,6 +123,7 @@ function readPackage(file) {
     console.warn(`Warning: ${id}: category "${info.category}" is not one of ${CATEGORIES.join(', ')}`);
   }
   if (info.pool && !['main', 'non-free'].includes(info.pool)) fail(id, 'pool must be "main" or "non-free"');
+  if (info.nsfw !== undefined && typeof info.nsfw !== 'boolean') fail(id, 'nsfw must be true or false');
   return Object.assign({ id }, info);
 }
 
@@ -174,8 +184,12 @@ function descriptionHtml(pkg) {
   return (shots.length ? `<p>${shots.join('\n')}</p>\n` : '') + marked.parse(pkg.description || '');
 }
 
-/** A plain page with the repository address and its apps. */
-function indexHtml(packages) {
+/**
+ * A plain page with a repository address and its apps.
+ * @param {Object[]} packages  the apps in this listing
+ * @param {{ repoUrl: string, note: string }} listing
+ */
+function indexHtml(packages, listing) {
   const apps = packages.map((p) => {
     const source = p.manifest && p.manifest.sourceUrl;
     const version = p.manifest && p.manifest.version ? ` <small>${escapeHtml(p.manifest.version)}</small>` : '';
@@ -202,7 +216,8 @@ function indexHtml(packages) {
 <h1>pustal's webOS apps</h1>
 <p>A repository for the <a href="https://github.com/webosbrew/webos-homebrew-channel">webOS Homebrew Channel</a>.
 On the TV, open Homebrew Channel → Settings → Add repository and enter:</p>
-<p><code>${escapeHtml(REPO_URL)}</code></p>
+<p><code>${escapeHtml(listing.repoUrl)}</code></p>
+<p>${listing.note}</p>
 <h2>Apps</h2>
 <ul>
 ${apps}
@@ -216,6 +231,34 @@ ${apps}
 function write(path, text) {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, text);
+}
+
+/**
+ * Writes one complete listing (its own apps.json, descriptions and page)
+ * under @p dir, so each listing works on its own.
+ * @param {string} dir  public/ or a folder below it
+ * @param {Object[]} packages
+ * @param {{ repoUrl: string, note: string }} listing
+ */
+function writeListing(dir, packages, listing) {
+  const apiRoot = join(dir, 'api');
+  write(join(dir, 'index.html'), indexHtml(packages, listing));
+
+  for (const p of packages) {
+    const appDir = join(apiRoot, 'apps', p.id);
+    write(join(appDir, 'full_description.html'), descriptionHtml(p));
+    write(join(appDir, 'releases', 'latest.json'), `${JSON.stringify(listItem(p, '../full_description.html'), null, 2)}\n`);
+  }
+
+  // The Homebrew Channel reads only this file and never asks for another
+  // page, so it holds every app and says it is the only page.
+  const list = {
+    paging: {
+      page: 1, count: packages.length, maxPage: 1, itemsTotal: packages.length, prevUrl: null, nextUrl: null,
+    },
+    packages: packages.map((p) => listItem(p, `apps/${p.id}/full_description.html`)),
+  };
+  write(join(apiRoot, 'apps.json'), `${JSON.stringify(list, null, 2)}\n`);
 }
 
 async function main() {
@@ -236,26 +279,23 @@ async function main() {
   rmSync(outDir, { recursive: true, force: true });
   // GitHub Pages: serve the files as they are (no Jekyll processing).
   write(join(outDir, '.nojekyll'), '');
-  write(join(outDir, 'index.html'), indexHtml(packages));
 
-  for (const p of packages) {
-    const appDir = join(apiDir, 'apps', p.id);
-    write(join(appDir, 'full_description.html'), descriptionHtml(p));
-    write(join(appDir, 'releases', 'latest.json'), `${JSON.stringify(listItem(p, '../full_description.html'), null, 2)}\n`);
-  }
+  const sfwPackages = packages.filter((p) => !p.nsfw);
+  writeListing(outDir, packages, {
+    repoUrl: REPO_URL,
+    note: `A listing without the apps for adults (${packages.length - sfwPackages.length} left out) is at `
+      + `<code>${escapeHtml(SFW_REPO_URL)}</code> (<a href="sfw/">its page</a>).`,
+  });
+  writeListing(join(outDir, 'sfw'), sfwPackages, {
+    repoUrl: SFW_REPO_URL,
+    note: 'This listing leaves out the apps for adults. '
+      + `The listing with every app is at <code>${escapeHtml(REPO_URL)}</code>.`,
+  });
 
-  // The Homebrew Channel reads only this file and never asks for another
-  // page, so it holds every app and says it is the only page.
-  const list = {
-    paging: {
-      page: 1, count: packages.length, maxPage: 1, itemsTotal: packages.length, prevUrl: null, nextUrl: null,
-    },
-    packages: packages.map((p) => listItem(p, `apps/${p.id}/full_description.html`)),
-  };
-  write(join(apiDir, 'apps.json'), `${JSON.stringify(list, null, 2)}\n`);
-
-  console.log(`Built ${packages.length} app${packages.length === 1 ? '' : 's'} into public/${offline ? ' (offline: manifests not checked)' : ''}.`);
+  console.log(`Built ${packages.length} app${packages.length === 1 ? '' : 's'} into public/`
+    + ` (${sfwPackages.length} in the listing without adult apps)${offline ? ' (offline: manifests not checked)' : ''}.`);
   console.log(`Repository address for the Homebrew Channel: ${REPO_URL}`);
+  console.log(`Without the adult apps: ${SFW_REPO_URL}`);
 }
 
 main();

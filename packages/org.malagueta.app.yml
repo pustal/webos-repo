@@ -10,6 +10,8 @@ manifestUrl: https://github.com/pustal/Malagueta/releases/latest/download/org.ma
 category: multimedia
 # Open source (GPL-3.0)
 pool: main
+# Adult content: left out of the listing without adult apps (sfw/api/apps.json).
+nsfw: true
 # The package installs on webOS 4, but today's sites need the compatibility
 # layer aimed at webOS 5 and 6 (Chromium 68/79); on webOS 4 most of them fail.
 requirements:

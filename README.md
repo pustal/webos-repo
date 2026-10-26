@@ -12,12 +12,19 @@ https://pustal.github.io/webos-repo/api/apps.json
 
 The apps then appear in the Homebrew Channel's list next to the official ones, and updates show up there as they are released.
 
+For a TV the whole family uses, add this address instead; it lists the same apps without the ones for adults (Stash and Malagueta):
+
+```
+https://pustal.github.io/webos-repo/sfw/api/apps.json
+```
+
 | App | Description |
 | --- | --- |
 | [Stash](https://github.com/pustal/StashWebOS) | Client for Stash, the self-hosted media organizer |
 | [Malagueta](https://github.com/pustal/Malagueta) | Adult website viewer with ad and pop-up blocking, made for the remote |
 | [Prosper LG TV](https://github.com/pustal/ProsperLGTV) | IPTV player for your own M3U playlists, made for the remote |
 | [SonicWebMania](https://github.com/pustal/SonicWebMania) | Sonic Mania (decompilation) as a native app; bring your own game data |
+| [Animal Crossing](https://github.com/pustal/Animal-Crossing-WebOS) | Animal Crossing (GameCube decompilation) as a native app; bring your own disc image |
 
 ## How it works
 
@@ -30,7 +37,10 @@ public/api/apps.json                          every app (the address added on th
 public/api/apps/<id>/full_description.html    each app's description
 public/api/apps/<id>/releases/latest.json     each app on its own (used by webOS Dev Manager)
 public/index.html                             a page with the address and the apps
+public/sfw/...                                the same files for the listing without adult apps
 ```
+
+An entry with `nsfw: true` is left out of the `sfw/` listing. The field is this repository's own and is never copied into the listings; remove it before submitting an entry to the official repository.
 
 The [Publish workflow](.github/workflows/publish.yml) builds them on every push to `main` and publishes them to GitHub Pages. One-time setup: **Settings → Pages → Source: GitHub Actions**.
 
@@ -84,6 +94,9 @@ Each entry points at its app's **latest** release manifest (`.../releases/latest
    # Optional: sponsor links, like .github/FUNDING.yml
    funding:
      ko_fi: pustal
+   # Optional (this repository only): true for apps for adults, which are then
+   # left out of the listing without adult apps (sfw/api/apps.json)
+   nsfw: false
    ```
 
 3. Run `npm run build` to check it (it downloads the manifest and fails on mistakes such as a missing field, a `.../blob/...` icon link or a manifest for another app id), then push to `main`. Also add the app to the table above.
@@ -98,7 +111,7 @@ Requires Node.js 22 (see `.nvmrc`).
 npm install
 npm run build            # checks every entry and its manifest, writes public/
 npm run build:offline    # the same without downloading manifests
-npm run serve            # builds and serves public/ on http://localhost:8000
+npm run serve            # builds and serves public/ on http://localhost:8000 (the listing without adult apps is under /sfw/)
 ```
 
 To try the local build on a TV on the same network, add `http://<computer's IP>:8000/api/apps.json` as a repository in the Homebrew Channel.

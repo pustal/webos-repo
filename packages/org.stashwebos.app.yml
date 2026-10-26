@@ -10,6 +10,8 @@ manifestUrl: https://github.com/pustal/StashWebOS/releases/latest/download/org.s
 category: multimedia
 # Open source
 pool: main
+# Adult content: left out of the listing without adult apps (sfw/api/apps.json).
+nsfw: true
 # The app targets the browser engine of webOS 4 (Chromium 53) and newer.
 requirements:
   webosRelease: '>=4.0'
