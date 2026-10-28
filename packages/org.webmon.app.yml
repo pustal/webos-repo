@@ -1,0 +1,42 @@
+# Webmon (gen1recomp for webOS): https://github.com/pustal/Webmon
+# The file name (without .yml) is the app id, as in appinfo.json.
+
+# Display name of the application
+title: Webmon
+# Publicly accessible HTTPS link to the icon image itself (not a github.com/.../blob/ page)
+iconUri: https://raw.githubusercontent.com/pustal/Webmon/main/webos/largeIcon.png
+# The manifest of the latest release (written by the webos-package build target)
+manifestUrl: https://github.com/pustal/Webmon/releases/latest/download/org.webmon.app.manifest.json
+category: game
+# Open source (MIT); runs the official gen1recomp release, which it downloads
+pool: main
+# Native app (LÖVE 11.5, OpenGL ES). Developed and tested on webOS 6
+# (Mali-G51); older TVs are untested.
+requirements:
+  webosRelease: '>=6.0'
+description: |
+  Runs gen1recomp (G1R Deluxe, the Pokemon Gen 1 Recompilation Project by
+  BOIS CLUB GAMES) on your LG TV: a native LÖVE build for webOS with a file
+  picker, USB storage and an upload page.
+
+  **You need your own ROM.** Webmon contains no game code or data. On first
+  launch press OK to download the latest official gen1recomp release onto the
+  TV, then import your own Game Boy ROM from the game's launcher.
+
+  - Upload page (address and PIN on the TV, press 1): upload or download ROMs,
+    saves, mod zips and carts, download the game's saves, send a mod's data
+    (such as a voxel map cache built on a computer) from a folder
+  - Keeps the game, its saves and mods in a Webmon folder on a USB drive when
+    there is one; finds Pokemon ROMs and saves in RetroArch-style roms/ and
+    saves/ folders (including N64 ROMs for mods like the Stadium 2 importer)
+  - Plays with a game controller or the TV remote; remote 1 or a controller's
+    Home button opens a menu with quick save and load, view options and Quit
+  - Voxel world mods (such as PotatoVoxel) are not recommended on TVs with
+    3 GB of RAM or less: they need more memory than webOS leaves an app
+
+  A non-commercial fan project, not affiliated with Nintendo, Creatures,
+  GAME FREAK or BOIS CLUB GAMES.
+# Screenshots shown above the description
+screenshots:
+  - url: https://raw.githubusercontent.com/pustal/Webmon/main/docs/images/web-page.png
+    caption: Upload page

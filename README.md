@@ -25,6 +25,7 @@ https://pustal.github.io/webos-repo/sfw/api/apps.json
 | [Prosper LG TV](https://github.com/pustal/ProsperLGTV) | IPTV player for your own M3U playlists, made for the remote |
 | [SonicWebMania](https://github.com/pustal/SonicWebMania) | Sonic Mania (decompilation) as a native app; bring your own game data |
 | [Animal Crossing](https://github.com/pustal/Animal-Crossing-WebOS) | Animal Crossing (GameCube decompilation) as a native app; bring your own disc image |
+| [Webmon](https://github.com/pustal/Webmon) | gen1recomp (Pokemon Gen 1 Recompilation Project) as a native app; bring your own ROM |
 
 ## How it works
 
