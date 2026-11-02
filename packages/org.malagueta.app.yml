@@ -16,6 +16,16 @@ nsfw: true
 # layer aimed at webOS 5 and 6 (Chromium 68/79); on webOS 4 most of them fail.
 requirements:
   webosRelease: '>=5.0'
+# Shown above the description (images from the app's README)
+screenshots:
+  - url: https://raw.githubusercontent.com/pustal/Malagueta/main/docs/screenshots/home.png
+    caption: Home screen
+  - url: https://raw.githubusercontent.com/pustal/Malagueta/main/docs/screenshots/edit-sites.png
+    caption: Edit sites
+  - url: https://raw.githubusercontent.com/pustal/Malagueta/main/docs/screenshots/settings.png
+    caption: Settings (PIN lock)
+  - url: https://raw.githubusercontent.com/pustal/Malagueta/main/docs/screenshots/about.png
+    caption: About
 description: |
   An adult website viewer for webOS TVs, made for the remote. **For adults only.**
 
